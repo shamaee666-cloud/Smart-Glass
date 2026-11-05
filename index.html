@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#102b35">
+<link rel="manifest" href="manifest.webmanifest">
+<title>SmartGlass AI | نسخه آزمایشی</title>
+<style>
+:root{--ink:#142f38;--muted:#667b80;--bg:#f3f7f6;--card:#fff;--line:#dce7e5;--accent:#0d766e;--accent2:#d9f0eb;--gold:#d7a64b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif}
+header{background:linear-gradient(135deg,#102b35,#185b5a);color:white;padding:24px 18px 28px;border-radius:0 0 24px 24px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;font-size:21px;letter-spacing:.2px}.tag{font-size:11px;background:#ffffff20;border:1px solid #ffffff35;padding:6px 10px;border-radius:99px}
+header p{margin:12px 0 0;color:#d5e8e5;font-size:13px;line-height:1.9}
+main{max-width:850px;margin:auto;padding:16px 14px 40px}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:-8px}
+.tab{border:1px solid var(--line);background:white;border-radius:14px;padding:12px 6px;color:var(--ink);font-weight:700;font-size:12px}
+.tab.active{background:var(--accent);color:white;border-color:var(--accent)}
+.panel{display:none;margin-top:16px}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:13px;box-shadow:0 4px 18px #183d3a08}
+h2{font-size:17px;margin:0 0 14px}h3{font-size:14px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:#fbfdfc;font:14px Tahoma;color:var(--ink);outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+.field{margin-bottom:12px}.full{grid-column:1/-1}
+button{cursor:pointer;font:700 13px Tahoma;border:0;border-radius:12px;padding:13px 15px}
+.primary{background:var(--accent);color:white}.secondary{background:var(--accent2);color:var(--accent)}.danger{background:#fff0ef;color:#a63e36}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.actions button{flex:1}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.photo{border:1px dashed #aac4bf;border-radius:13px;padding:9px;text-align:center;background:#f8fbfa}
+.photo img{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:8px;background:#edf3f1;display:none}
+.photo strong{display:block;font-size:11px;margin:7px 0;color:var(--ink)}
+.photo input{font-size:10px;padding:7px}
+.hint{font-size:11px;color:var(--muted);line-height:1.8}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:#f5faf8;border-radius:14px;padding:14px}.stat b{font-size:23px;display:block}.stat span{font-size:11px;color:var(--muted)}
+.search{margin-bottom:12px}
+.item{display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:center;border-top:1px solid var(--line);padding:12px 0}
+.item:first-child{border-top:0}.thumbs{display:flex;gap:4px}.thumbs img{width:28px;height:48px;object-fit:cover;border-radius:5px;background:#edf3f1}
+.item b{font-size:13px}.item small{display:block;color:var(--muted);font-size:11px;line-height:1.8;margin-top:4px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 5px}
+video{width:100%;max-height:360px;background:#102b35;border-radius:14px;object-fit:cover;transform:scaleX(-1)}
+#captured{width:100%;border-radius:14px;display:none}
+.notice{background:#fff8e8;border:1px solid #f0dfb9;color:#70551e;padding:12px;border-radius:12px;font-size:11px;line-height:1.9}
+footer{text-align:center;color:#8a9b9a;font-size:10px;padding:15px}
+@media(max-width:480px){.grid{grid-template-columns:1fr 1fr}.photo-grid{gap:6px}.photo{padding:6px}.photo input{font-size:9px}.tab{font-size:11px;padding:11px 3px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><div class="brand">👓 SmartGlass AI</div><span class="tag">نسخه آزمایشی ۰.۱</span></div>
+ <p>مدیریت عینک‌های فروشگاه و آماده‌سازی تجربه انتخاب هوشمند فریم</p>
+</header>
+<main>
+ <nav class="tabs">
+  <button class="tab active" data-tab="dashboard">داشبورد</button>
+  <button class="tab" data-tab="add">ثبت عینک</button>
+  <button class="tab" data-tab="customer">مشتری و دوربین</button>
+ </nav>
+
+ <section id="dashboard" class="panel active">
+  <div class="card">
+   <h2>خلاصه فروشگاه</h2>
+   <div class="stats">
+    <div class="stat"><b id="count">۰</b><span>مدل ثبت‌شده</span></div>
+    <div class="stat"><b id="stock">۰</b><span>موجودی کل</span></div>
+   </div>
+  </div>
+  <div class="card">
+   <h2>کاتالوگ عینک‌ها</h2>
+   <input id="search" class="search" placeholder="جست‌وجوی برند یا مدل...">
+   <div id="inventory"><div class="empty">هنوز عینکی ثبت نشده است. از بخش «ثبت عینک» شروع کنید.</div></div>
+  </div>
+ </section>
+
+ <section id="add" class="panel">
+  <div class="card">
+   <h2>ثبت عینک جدید</h2>
+   <div class="field"><label>سه عکس از عینک (روبه‌رو، ۴۵ درجه، جانبی)</label>
+    <div class="photo-grid">
+     <div class="photo"><img id="preview0" alt="نمای روبه‌رو"><strong>نمای روبه‌رو</strong><input type="file" accept="image/*" capture="environment" id="photo0"></div>
+     <div class="photo"><img id="preview1" alt="نمای ۴۵ درجه"><strong>نمای ۴۵ درجه</strong><input type="file" accept="image/*" capture="environment" id="photo1"></div>
+     <div class="photo"><img id="preview2" alt="نمای جانبی"><strong>نمای جانبی</strong><input type="file" accept="image/*" capture="environment" id="photo2"></div>
+    </div>
+    <p class="hint">برای نتیجه بهتر، عینک را روی زمینه ساده و با نور یکنواخت عکاسی کنید.</p>
+   </div>
+   <div class="grid">
+    <div class="field"><label for="brand">برند</label><input id="brand" placeholder="مثلاً Ray-Ban"></div>
+    <div class="field"><label for="model">مدل / کد</label><input id="model" placeholder="مثلاً RB-001"></div>
+    <div class="field"><label for="color">رنگ</label><input id="color" placeholder="مشکی"></div>
+    <div class="field"><label for="price">قیمت</label><input id="price" type="number" min="0" placeholder="قیمت"></div>
+    <div class="field"><label for="quantity">تعداد موجودی</label><input id="quantity" type="number" min="0" value="1"></div>
+    <div class="field"><label for="shape">شکل فریم</label><select id="shape"><option value="">انتخاب نشده</option><option>گرد</option><option>مربعی</option><option>مستطیلی</option><option>خلبانی</option><option>گربه‌ای</option><option>بیضی</option><option>چندضلعی</option><option>نامشخص</option></select></div>
+   </div>
+   <h3>ابعاد واقعی فریم (میلی‌متر)</h3>
+   <div class="grid">
+    <div class="field"><label for="lens">عرض عدسی</label><input id="lens" type="number" placeholder="مثلاً ۵۲"></div>
+    <div class="field"><label for="bridge">عرض پل بینی</label><input id="bridge" type="number" placeholder="مثلاً ۱۸"></div>
+    <div class="field"><label for="temple">طول دسته</label><input id="temple" type="number" placeholder="مثلاً ۱۴۵"></div>
+    <div class="field"><label for="framewidth">عرض کلی فریم</label><input id="framewidth" type="number" placeholder="مثلاً ۱۴۰"></div>
+   </div>
+   <div class="field"><label for="notes">توضیحات</label><input id="notes" placeholder="جنس، سبک یا نکته دیگر"></div>
+   <div class="actions"><button class="primary" id="save">ذخیره عینک</button><button class="secondary" id="clear">پاک کردن فرم</button></div>
+   <p class="hint">در این نسخه اطلاعات و تصاویر روی همین دستگاه ذخیره می‌شوند؛ هنوز همگام‌سازی ابری فعال نیست.</p>
+  </div>
+ </section>
+
+ <section id="customer" class="panel">
+  <div class="card">
+   <h2>عکس‌برداری مشتری</h2>
+   <div class="notice">قبل از عکس‌برداری رضایت مشتری را بگیرید. این نسخه فقط پیش‌نمایش و ثبت آزمایشی عکس را انجام می‌دهد؛ تصویر مشتری ذخیره یا برای تحلیل هوش مصنوعی ارسال نمی‌شود.</div>
+   <p class="hint">تبلت را ثابت نگه دارید، نور روبه‌روی صورت باشد و مشتری مستقیم به دوربین نگاه کند.</p>
+   <video id="video" autoplay playsinline muted></video>
+   <canvas id="canvas" hidden></canvas>
+   <img id="captured" alt="عکس آزمایشی مشتری">
+   <div class="actions">
+    <button class="primary" id="startCamera">روشن کردن دوربین جلو</button>
+    <button class="secondary" id="takePhoto" disabled>گرفتن عکس آزمایشی</button>
+    <button class="danger" id="stopCamera" disabled>خاموش کردن دوربین</button>
+   </div>
+   <p id="cameraStatus" class="hint">دوربین هنوز فعال نشده است.</p>
+  </div>
+ </section>
+ <footer>SmartGlass AI · Prototype 0.1 · نسخه آزمایشی محلی</footer>
+</main>
+<script>
+const DB_NAME='smartglass-ai-db', STORE='frames';
+let db, streams=[];
+const fa=n=>new Intl.NumberFormat('fa-IR').format(n||0);
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>req.result.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+function tx(mode='readonly'){return db.transaction(STORE,mode).objectStore(STORE);}
+function allFrames(){return new Promise((res,rej)=>{const r=tx().getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+function saveFrame(item){return new Promise((res,rej)=>{const r=tx('readwrite').add(item);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+function deleteFrame(id){return new Promise((res,rej)=>{const r=tx('readwrite').delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active');}));
+const photoFiles=[null,null,null];
+[0,1,2].forEach(i=>document.getElementById('photo'+i).addEventListener('change',e=>{const f=e.target.files[0];photoFiles[i]=f||null;const img=document.getElementById('preview'+i);if(f){img.src=URL.createObjectURL(f);img.style.display='block';}}));
+function val(id){return document.getElementById(id).value.trim();}
+function clearForm(){['brand','model','color','price','quantity','shape','lens','bridge','temple','framewidth','notes'].forEach(id=>document.getElementById(id).value=id==='quantity'?'1':'');[0,1,2].forEach(i=>{photoFiles[i]=null;document.getElementById('photo'+i).value='';document.getElementById('preview'+i).removeAttribute('src');document.getElementById('preview'+i).style.display='none';});}
+document.getElementById('clear').onclick=clearForm;
+document.getElementById('save').onclick=async()=>{
+ const brand=val('brand'),model=val('model');
+ if(!brand||!model){alert('لطفاً برند و مدل را وارد کنید.');return;}
+ if(!photoFiles.some(Boolean)){if(!confirm('هیچ عکسی انتخاب نشده است. بدون عکس ذخیره شود؟'))return;}
+ const item={brand,model,color:val('color'),price:Number(val('price')||0),quantity:Number(val('quantity')||0),shape:val('shape'),lens:val('lens'),bridge:val('bridge'),temple:val('temple'),framewidth:val('framewidth'),notes:val('notes'),photos:photoFiles.map(f=>f||null),createdAt:Date.now()};
+ try{await saveFrame(item);clearForm();await render();alert('عینک با موفقیت در همین تبلت ذخیره شد.');document.querySelector('[data-tab="dashboard"]').click();}catch(e){alert('ذخیره انجام نشد: '+e.message);}
+};
+async function render(){const items=await allFrames();document.getElementById('count').textContent=fa(items.length);document.getElementById('stock').textContent=fa(items.reduce((s,x)=>s+(x.quantity||0),0));const q=(document.getElementById('search').value||'').toLowerCase();const list=items.filter(x=>(x.brand+' '+x.model+' '+x.color).toLowerCase().includes(q));const root=document.getElementById('inventory');root.innerHTML='';if(!list.length){root.innerHTML='<div class="empty">موردی پیدا نشد.</div>';return;}list.sort((a,b)=>b.createdAt-a.createdAt).forEach(x=>{const div=document.createElement('div');div.className='item';const thumbs=document.createElement('div');thumbs.className='thumbs';x.photos.forEach(f=>{if(f){const im=document.createElement('img');im.src=URL.createObjectURL(f);thumbs.append(im);}});if(!thumbs.children.length)thumbs.textContent='بدون عکس';const info=document.createElement('div');const title=document.createElement('b');title.textContent=x.brand+' · '+x.model;const meta=document.createElement('small');meta.textContent=[x.color,x.shape,'موجودی: '+fa(x.quantity),'قیمت: '+fa(x.price)].filter(Boolean).join(' | ');const del=document.createElement('button');del.className='danger';del.textContent='حذف';del.style.padding='7px 12px';del.style.marginTop='7px';del.onclick=async()=>{if(confirm('این عینک حذف شود؟')){await deleteFrame(x.id);render();}};info.append(title,meta,del);div.append(thumbs,info);root.append(div);});}
+document.getElementById('search').addEventListener('input',render);
+const video=document.getElementById('video'),status=document.getElementById('cameraStatus'),capture=document.getElementById('captured'),take=document.getElementById('takePhoto'),stop=document.getElementById('stopCamera');
+document.getElementById('startCamera').onclick=async()=>{try{const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});streams.push(s);video.srcObject=s;status.textContent='دوربین فعال است. برای عکس آزمایشی دکمه را بزنید.';take.disabled=false;stop.disabled=false;}catch(e){status.textContent='دسترسی به دوربین ممکن نشد. سایت باید با HTTPS باز شود و اجازه دوربین داده شود. ('+e.name+')';}};
+take.onclick=()=>{const c=document.getElementById('canvas');c.width=video.videoWidth;c.height=video.videoHeight;c.getContext('2d').drawImage(video,0,0);capture.src=c.toDataURL('image/jpeg',.88);capture.style.display='block';status.textContent='عکس فقط در همین صفحه نمایش داده شد و ذخیره نشد.';};
+stop.onclick=()=>{streams.forEach(s=>s.getTracks().forEach(t=>t.stop()));streams=[];video.srcObject=null;take.disabled=true;stop.disabled=true;status.textContent='دوربین خاموش شد.';};
+(async()=>{try{db=await openDB();await render();}catch(e){alert('مرورگر از ذخیره‌سازی محلی پشتیبانی نکرد.');}})();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
