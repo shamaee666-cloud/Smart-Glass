@@ -1,10 +1,10 @@
 {
-  "name": "SmartGlass AI",
-  "short_name": "SmartGlass",
-  "lang": "fa",
-  "dir": "rtl",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#f3f7f6",
-  "theme_color": "#102b35"
+  "name":"SmartGlass AI",
+  "short_name":"SmartGlass",
+  "start_url":".",
+  "display":"standalone",
+  "background_color":"#f4f7f7",
+  "theme_color":"#0f766e",
+  "lang":"fa",
+  "dir":"rtl"
 }
