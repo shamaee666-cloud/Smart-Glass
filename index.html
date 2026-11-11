@@ -97,11 +97,39 @@ button,input,select{font:inherit}button{cursor:pointer}.app{min-height:100vh}.to
 </div>
 
 <script>
-const KEY='smartglass_products_v02';
-let products=JSON.parse(localStorage.getItem(KEY)||'[]');
+const pModel=document.getElementById('pModel'), pBrand=document.getElementById('pBrand'), pColor=document.getElementById('pColor'), pPrice=document.getElementById('pPrice'), pStock=document.getElementById('pStock'), pWidth=document.getElementById('pWidth'), pLens=document.getElementById('pLens'), pBridge=document.getElementById('pBridge'), pTemple=document.getElementById('pTemple'), pNotes=document.getElementById('pNotes'), pFront=document.getElementById('pFront'), p45=document.getElementById('p45'), pSide=document.getElementById('pSide'), adminMsg=document.getElementById('adminMsg'), statModels=document.getElementById('statModels'), statStock=document.getElementById('statStock'), statAvailable=document.getElementById('statAvailable'), productList=document.getElementById('productList'), adminPass=document.getElementById('adminPass'), loginError=document.getElementById('loginError'), video=document.getElementById('video'), camPlaceholder=document.getElementById('camPlaceholder'), canvas=document.getElementById('canvas'), captured=document.getElementById('captured'), startCamBtn=document.getElementById('startCamBtn'), captureBtn=document.getElementById('captureBtn'), retakeBtn=document.getElementById('retakeBtn'), cameraMsg=document.getElementById('cameraMsg'), customModel=document.getElementById('customModel'), customResult=document.getElementById('customResult'), tryOnBox=document.getElementById('tryOnBox'), tryOnText=document.getElementById('tryOnText'), recBox=document.getElementById('recBox'), recommendations=document.getElementById('recommendations');
+const KEY='smartglass_products_v03';
+let products=[];
+const DB_NAME='SmartGlassAI_DB', DB_VERSION=1, STORE='products';
+let db;
+function openDB(){
+ return new Promise((resolve,reject)=>{
+  const r=indexedDB.open(DB_NAME,DB_VERSION);
+  r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:'id'})};
+  r.onsuccess=()=>{db=r.result;resolve(db)}; r.onerror=()=>reject(r.error);
+ });
+}
+function loadProducts(){
+ return new Promise((resolve,reject)=>{
+  const q=db.transaction(STORE,'readonly').objectStore(STORE).getAll();
+  q.onsuccess=()=>{products=q.result||[];resolve(products)}; q.onerror=()=>reject(q.error);
+ });
+}
+function putProduct(p){
+ return new Promise((resolve,reject)=>{
+  const q=db.transaction(STORE,'readwrite').objectStore(STORE).put(p);
+  q.onsuccess=()=>resolve(); q.onerror=()=>reject(q.error);
+ });
+}
+function removeProduct(id){
+ return new Promise((resolve,reject)=>{
+  const q=db.transaction(STORE,'readwrite').objectStore(STORE).delete(id);
+  q.onsuccess=()=>resolve(); q.onerror=()=>reject(q.error);
+ });
+}
+openDB().then(loadProducts).then(()=>renderAdmin()).catch(e=>console.error(e));
 let stream=null, editId=null;
 
-function saveAll(){localStorage.setItem(KEY,JSON.stringify(products))}
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -111,9 +139,9 @@ function showScreen(id){
 document.getElementById('homeBtn').onclick=()=>showScreen('home');
 
 function adminLogin(){
-  const pass=document.getElementById('adminPass').value;
-  if(pass==='1234'){document.getElementById('loginError').textContent='';showScreen('admin');document.getElementById('adminPass').value='';}
-  else document.getElementById('loginError').textContent='رمز صحیح نیست.';
+  const pass=adminPass.value;
+  if(pass==='1234'){loginError.textContent='';showScreen('admin');adminPass.value='';}
+  else loginError.textContent='رمز صحیح نیست.';
 }
 
 function fileToData(file){
@@ -123,21 +151,33 @@ function fileToData(file){
   })
 }
 async function saveProduct(){
-  const model=document.getElementById('pModel').value.trim();
-  if(!model){alert('شماره مدل را وارد کنید.');return}
-  const files=await Promise.all([fileToData(document.getElementById('pFront').files[0]),fileToData(document.getElementById('p45').files[0]),fileToData(document.getElementById('pSide').files[0])]);
-  const p={id:editId||Date.now(),model,brand:pBrand.value.trim(),color:pColor.value.trim(),price:Number(pPrice.value||0),stock:Number(pStock.value||0),width:Number(pWidth.value||0),lens:Number(pLens.value||0),bridge:Number(pBridge.value||0),temple:Number(pTemple.value||0),notes:pNotes.value.trim(),front:files[0],a45:files[1],side:files[2]};
-  const idx=products.findIndex(x=>x.id===p.id);
-  if(idx>=0){products[idx]={...products[idx],...p,front:p.front||products[idx].front,a45:p.a45||products[idx].a45,side:p.side||products[idx].side}}
-  else products.push(p);
-  saveAll();clearProductForm();renderAdmin();document.getElementById('adminMsg').textContent='عینک با موفقیت ذخیره شد.';
+  try{
+    const model=pModel.value.trim();
+    if(!model){alert('شماره مدل را وارد کنید.');return}
+    const files=await Promise.all([fileToData(pFront.files[0]),fileToData(p45.files[0]),fileToData(pSide.files[0])]);
+    const old=products.find(x=>x.id===editId);
+    const p={id:editId||Date.now(),model,brand:pBrand.value.trim(),color:pColor.value.trim(),
+      price:Number(pPrice.value||0),stock:Number(pStock.value||0),width:Number(pWidth.value||0),
+      lens:Number(pLens.value||0),bridge:Number(pBridge.value||0),temple:Number(pTemple.value||0),
+      notes:pNotes.value.trim(),front:files[0]||old?.front||'',a45:files[1]||old?.a45||'',side:files[2]||old?.side||''};
+    await putProduct(p);
+    await loadProducts();
+    clearProductForm(); renderAdmin();
+    adminMsg.textContent='✅ عینک با موفقیت ثبت شد.';
+  }catch(e){
+    console.error(e);
+    adminMsg.textContent='❌ ذخیره انجام نشد. لطفاً دوباره تلاش کنید.';
+    alert('خطا در ذخیره عینک: '+(e?.message||e));
+  }
 }
 function clearProductForm(){editId=null;['pModel','pBrand','pColor','pPrice','pWidth','pLens','pBridge','pTemple','pNotes'].forEach(id=>document.getElementById(id).value='');pStock.value=1;['pFront','p45','pSide'].forEach(id=>document.getElementById(id).value='')}
 function editProduct(id){
   const p=products.find(x=>x.id===id);if(!p)return;editId=id;
   pModel.value=p.model;pBrand.value=p.brand||'';pColor.value=p.color||'';pPrice.value=p.price||'';pStock.value=p.stock||0;pWidth.value=p.width||'';pLens.value=p.lens||'';pBridge.value=p.bridge||'';pTemple.value=p.temple||'';pNotes.value=p.notes||'';window.scrollTo({top:0,behavior:'smooth'});
 }
-function deleteProduct(id){if(confirm('این مدل حذف شود؟')){products=products.filter(x=>x.id!==id);saveAll();renderAdmin()}}
+async function deleteProduct(id){
+ if(confirm('این مدل حذف شود؟')){await removeProduct(id);await loadProducts();renderAdmin()}
+}
 function renderAdmin(){
   statModels.textContent=products.length;
   statStock.textContent=products.reduce((a,p)=>a+(Number(p.stock)||0),0);
